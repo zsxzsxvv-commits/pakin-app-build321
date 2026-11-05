@@ -15,48 +15,82 @@ jobs:
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
-      - name: Auto-Detect Project Structure & Fix Paths
+      - name: Reconstruct Xcode Project & Clean Duplicates
         run: |
-          echo "=== 1. Checking Directory Structure ==="
-          ls -la
-
-          # หากไฟล์อยู่ในโฟลเดอร์ย่อย UP_TO_GITHUB_COMBINED ให้ดึงออกมาที่ Root อัตโนมัติ
-          if [ -d "UP_TO_GITHUB_COMBINED" ]; then
-            echo "Moving files from UP_TO_GITHUB_COMBINED to root..."
-            cp -Rf UP_TO_GITHUB_COMBINED/* . 2>/dev/null || true
-            cp -Rf UP_TO_GITHUB_COMBINED/.* . 2>/dev/null || true
+          echo "=== 1. Cleaning duplicate files with (1), (2), etc. ==="
+          find . -maxdepth 2 -name "* (*)*" -exec rm -f {} + 2>/dev/null || true
+          
+          echo "=== 2. Reconstructing PAKIN_EPIC.xcodeproj ==="
+          mkdir -p PAKIN_EPIC.xcodeproj
+          if [ -f "project.pbxproj" ]; then
+            cp project.pbxproj PAKIN_EPIC.xcodeproj/
           fi
-
-          # ค้นหาตำแหน่งไฟล์ .xcodeproj อัตโนมัติ
-          PROJECT_FILE=$(find . -name "*.xcodeproj" -maxdepth 3 | head -n 1)
-          if [ -z "$PROJECT_FILE" ]; then
-            echo "❌ Error: Could not find any .xcodeproj in the repository!"
-            echo "Current files:"
-            find . -maxdepth 3
-            exit 1
-          fi
-
-          PROJECT_DIR=$(dirname "$PROJECT_FILE")
-          echo "Found project at: $PROJECT_FILE (Directory: $PROJECT_DIR)"
-
-          if [ "$PROJECT_DIR" != "." ]; then
-            echo "Moving project contents from $PROJECT_DIR to root..."
-            cp -Rf "$PROJECT_DIR"/* . 2>/dev/null || true
-          fi
-
-          # 2. ปรับแต่งไฟล์โปรเจกต์
+          # ลบ Info.plist ออกจาก Resources ของ xcode เพื่อป้องกัน duplicate warning
           sed -i '' '/Info.plist in Resources/d' PAKIN_EPIC.xcodeproj/project.pbxproj 2>/dev/null || true
-          find . -type f -name "*.swift" -exec sed -i '' 's/licenseManager\.revoke()/licenseManager.signOutLicense()/g' {} + 2>/dev/null || true
-          
-          # 3. จัดการโครงสร้างไฟล์ Swift
-          cp Core/*/*.swift Core/ 2>/dev/null || true
-          cp Models/*/*.swift Models/ 2>/dev/null || true
-          
-          # จัดการไฟล์ Clock สำหรับหน้าพรางตัว
-          mkdir -p Features/Clock
-          cp -n Features/*Clock*.swift Features/Clock/ 2>/dev/null || true
 
-          # 4. เพิ่ม revoke() ใน HTVLicenseManager หากขาดไป
+          echo "=== 3. Distributing files to expected Xcode directories ==="
+          # Folder: App
+          mkdir -p App
+          cp PAKIN_EPICApp.swift App/ 2>/dev/null || true
+          cp ContentView.swift App/ 2>/dev/null || true
+
+          # Folder: Core
+          mkdir -p Core
+          cp AppConfig.swift Core/ 2>/dev/null || true
+          cp AppLog.swift Core/ 2>/dev/null || true
+          cp DeviceUtility.swift Core/ 2>/dev/null || true
+          cp HTVLicenseManager.swift Core/ 2>/dev/null || true
+          cp HTVLicenseAPI.swift Core/ 2>/dev/null || true
+          cp HTVLicenseError.swift Core/ 2>/dev/null || true
+          cp CloudConfigManager.swift Core/ 2>/dev/null || true
+
+          # Folder: Models
+          mkdir -p Models
+          cp AppState.swift Models/ 2>/dev/null || true
+          cp FreeFireModels.swift Models/ 2>/dev/null || true
+          cp LicenseModels.swift Models/ 2>/dev/null || true
+          cp PatchModels.swift Models/ 2>/dev/null || true
+          cp RepositoryModels.swift Models/ 2>/dev/null || true
+          cp WallpaperModels.swift Models/ 2>/dev/null || true
+
+          # Folder: Features & Clock
+          mkdir -p Features/Clock
+          cp ClockModels.swift Features/Clock/ 2>/dev/null || true
+          cp ClockRootView.swift Features/Clock/ 2>/dev/null || true
+          cp WorldClockView.swift Features/Clock/ 2>/dev/null || true
+          cp AlarmsView.swift Features/Clock/ 2>/dev/null || true
+          cp StopwatchView.swift Features/Clock/ 2>/dev/null || true
+          cp TimerCountdownView.swift Features/Clock/ 2>/dev/null || true
+
+          cp FreeFireHubView.swift Features/ 2>/dev/null || true
+          cp HTVLicenseGateView.swift Features/ 2>/dev/null || true
+          cp SettingsView.swift Features/ 2>/dev/null || true
+          cp OnboardingView.swift Features/ 2>/dev/null || true
+          cp RepositoryHomeView.swift Features/ 2>/dev/null || true
+          cp RepositorySourcesView.swift Features/ 2>/dev/null || true
+          cp WallpapersView.swift Features/ 2>/dev/null || true
+          cp CleanerView.swift Features/ 2>/dev/null || true
+          cp AppDataBrowserView.swift Features/ 2>/dev/null || true
+          cp GestaltEditorView.swift Features/ 2>/dev/null || true
+          cp PatchProjectsView.swift Features/ 2>/dev/null || true
+
+          # Folder: Components
+          mkdir -p Components
+          cp HTVScreenBackground.swift Components/ 2>/dev/null || true
+          cp HTVSectionHeader.swift Components/ 2>/dev/null || true
+          cp HTVComponents.swift Components/ 2>/dev/null || true
+
+          # Folder: Resources
+          mkdir -p Resources/Mods
+          mkdir -p Resources/Assets.xcassets/AppIcon.appiconset
+          cp Info.plist Resources/ 2>/dev/null || true
+          cp *.3105 Resources/Mods/ 2>/dev/null || true
+          cp AppIcon*.png Resources/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null || true
+          cp Contents.json Resources/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null || true
+
+          echo "=== 4. Patching Swift source code fixes ==="
+          find . -type f -name "*.swift" -exec sed -i '' 's/licenseManager\.revoke()/licenseManager.signOutLicense()/g' {} + 2>/dev/null || true
+
           python3 -c '
           import glob
           for path in glob.glob("**/*HTVLicenseManager.swift", recursive=True):
@@ -92,6 +126,7 @@ jobs:
           mkdir -p build/Payload/PAKIN_EPIC.app/Mods
           cp Resources/Mods/*.3105 build/Payload/PAKIN_EPIC.app/Mods/ 2>/dev/null || true
           cp Resources/Mods/*.3105 build/Payload/PAKIN_EPIC.app/ 2>/dev/null || true
+          cp *.3105 build/Payload/PAKIN_EPIC.app/Mods/ 2>/dev/null || true
           cp pakin_antiban_dns.mobileconfig build/Payload/PAKIN_EPIC.app/ 2>/dev/null || true
           
           # ผนวก CoreAssets Bundle
