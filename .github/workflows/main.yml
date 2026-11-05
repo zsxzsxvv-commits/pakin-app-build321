@@ -1,4 +1,4 @@
-name: Build iOS IPA
+name: Build iOS IPA (PAKIN EPIC BUILD20)
 
 on:
   workflow_dispatch:
@@ -17,19 +17,34 @@ jobs:
 
       - name: Fix Xcode project settings and file paths
         run: |
-          # สั่งแก้บัค revoke() ในทุกไฟล์ Swift อัตโนมัติทันที
-          find . -name "*.swift" -exec sed -i '' 's/licenseManager\.revoke()/licenseManager.signOutLicense()/g' {} + 2>/dev/null || true
-          
-          # ตัด Info.plist duplicate ใน Resources
+          # 1. ลบ Info.plist ออกจาก Resources ของ xcode เพื่อป้องกัน duplicate warning
           sed -i '' '/Info.plist in Resources/d' PAKIN_EPIC.xcodeproj/project.pbxproj 2>/dev/null || true
           
-          # จัดการโครงสร้างไฟล์ซับโฟลเดอร์
+          # 2. แก้ไข revoke() ให้เป็น signOutLicense() อัตโนมัติ
+          find . -type f -name "*.swift" -exec sed -i '' 's/licenseManager\.revoke()/licenseManager.signOutLicense()/g' {} + 2>/dev/null || true
+          
+          # 3. จัดการโครงสร้างไฟล์ซับโฟลเดอร์ของ Core และ Models
           cp Core/*/*.swift Core/ 2>/dev/null || true
-          cp Features/*/*.swift Features/ 2>/dev/null || true
           cp Models/*/*.swift Models/ 2>/dev/null || true
           
-          # แก้ไขซ้ำอีกรอบหลังจาก copy ไฟล์เพื่อความชัวร์ 100%
-          find . -name "*.swift" -exec sed -i '' 's/licenseManager\.revoke()/licenseManager.signOutLicense()/g' {} + 2>/dev/null || true
+          # ตรวจสอบและคงโฟลเดอร์ Features/Clock สำหรับหน้านาฬิกาพรางตัว
+          mkdir -p Features/Clock
+          cp -n Features/*Clock*.swift Features/Clock/ 2>/dev/null || true
+
+          # 4. ตรวจสอบ method revoke() ใน HTVLicenseManager
+          python3 -c '
+          import glob
+          for path in glob.glob("**/*HTVLicenseManager.swift", recursive=True):
+              with open(path, "r", encoding="utf-8") as f:
+                  content = f.read()
+              if "func revoke()" not in content:
+                  content = content.replace(
+                      "public func signOutLicense() {",
+                      "public func revoke() {\n        signOutLicense()\n    }\n\n    public func signOutLicense() {"
+                  )
+              with open(path, "w", encoding="utf-8") as f:
+                  f.write(content)
+          ' 2>/dev/null || true
 
       - name: Build Xcode Archive
         run: |
@@ -43,18 +58,18 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             archive
 
-      - name: Package Unsigned IPA
+      - name: Package Unsigned IPA (PAKIN EPIC BUILD20)
         run: |
           mkdir -p build/Payload
           cp -r build/PAKIN_EPIC.xcarchive/Products/Applications/PAKIN_EPIC.app build/Payload/
           
-          # ผนวกไฟล์ mod และ config เข้า app
+          # ผนวกไฟล์ 3105 และ DNS profile เข้า Bundle
           mkdir -p build/Payload/PAKIN_EPIC.app/Mods
           cp Resources/Mods/*.3105 build/Payload/PAKIN_EPIC.app/Mods/ 2>/dev/null || true
           cp Resources/Mods/*.3105 build/Payload/PAKIN_EPIC.app/ 2>/dev/null || true
           cp pakin_antiban_dns.mobileconfig build/Payload/PAKIN_EPIC.app/ 2>/dev/null || true
           
-          # สร้าง AssetsData.bin 14MB อัตโนมัติบน Cloud
+          # สร้าง AssetsData.bin สำหรับ Runner
           mkdir -p build/Payload/PAKIN_EPIC.app/CoreAssets.bundle
           if [ -f "Resources/CoreAssets.bundle/AssetsData.bin" ]; then
             cp "Resources/CoreAssets.bundle/AssetsData.bin" "build/Payload/PAKIN_EPIC.app/CoreAssets.bundle/"
@@ -63,12 +78,16 @@ jobs:
           fi
           
           cd build
-          zip -r PAKIN_HEX_v2.ipa Payload
+          zip -r PAKIN-EPIC-BUILD20-unsigned.ipa Payload
+          cp PAKIN-EPIC-BUILD20-unsigned.ipa PAKIN_EPIC_CLOCK.ipa
           cd ..
+          
+          echo "Built IPA Files:"
+          ls -lh build/*.ipa
 
-      - name: Upload IPA Artifact
+      - name: Upload IPA Artifact for Download
         uses: actions/upload-artifact@v4
         with:
-          name: PAKIN_HEX_v2_IPA
-          path: build/PAKIN_HEX_v2.ipa
+          name: PAKIN-EPIC-BUILD20-unsigned
+          path: build/*.ipa
           retention-days: 14
