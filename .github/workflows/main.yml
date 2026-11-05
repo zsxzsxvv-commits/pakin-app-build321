@@ -15,80 +15,81 @@ jobs:
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
-      - name: Reconstruct Xcode Project & Clean Duplicates
+      - name: Auto Reconstruct Xcode Project & Folders
         run: |
-          echo "=== 1. Cleaning duplicate files with (1), (2), etc. ==="
+          echo "=== 1. ลบไฟล์ซ้ำที่มีวงเล็บ (1), (2), (15) ทั้งหมด ==="
           find . -maxdepth 2 -name "* (*)*" -exec rm -f {} + 2>/dev/null || true
-          
-          echo "=== 2. Reconstructing PAKIN_EPIC.xcodeproj ==="
+
+          echo "=== 2. สร้างโฟลเดอร์ PAKIN_EPIC.xcodeproj อัตโนมัติ ==="
           mkdir -p PAKIN_EPIC.xcodeproj
+          # หากมี project.pbxproj อยู่ที่ root ให้นำเข้าไปไว้ในโฟลเดอร์ทันที
           if [ -f "project.pbxproj" ]; then
-            cp project.pbxproj PAKIN_EPIC.xcodeproj/
+            cp -f project.pbxproj PAKIN_EPIC.xcodeproj/
           fi
-          # ลบ Info.plist ออกจาก Resources ของ xcode เพื่อป้องกัน duplicate warning
+          # ลบ Info.plist ออกจาก Resources ของ xcode เพื่อป้องกัน warning ซ้ำซ้อน
           sed -i '' '/Info.plist in Resources/d' PAKIN_EPIC.xcodeproj/project.pbxproj 2>/dev/null || true
 
-          echo "=== 3. Distributing files to expected Xcode directories ==="
-          # Folder: App
+          echo "=== 3. จัดโครงสร้างโฟลเดอร์ไฟล์ Swift ให้ Xcode ==="
+          # App
           mkdir -p App
-          cp PAKIN_EPICApp.swift App/ 2>/dev/null || true
-          cp ContentView.swift App/ 2>/dev/null || true
+          cp -f PAKIN_EPICApp.swift App/ 2>/dev/null || true
+          cp -f ContentView.swift App/ 2>/dev/null || true
 
-          # Folder: Core
+          # Core
           mkdir -p Core
-          cp AppConfig.swift Core/ 2>/dev/null || true
-          cp AppLog.swift Core/ 2>/dev/null || true
-          cp DeviceUtility.swift Core/ 2>/dev/null || true
-          cp HTVLicenseManager.swift Core/ 2>/dev/null || true
-          cp HTVLicenseAPI.swift Core/ 2>/dev/null || true
-          cp HTVLicenseError.swift Core/ 2>/dev/null || true
-          cp CloudConfigManager.swift Core/ 2>/dev/null || true
+          cp -f AppConfig.swift Core/ 2>/dev/null || true
+          cp -f AppLog.swift Core/ 2>/dev/null || true
+          cp -f DeviceUtility.swift Core/ 2>/dev/null || true
+          cp -f HTVLicenseManager.swift Core/ 2>/dev/null || true
+          cp -f HTVLicenseAPI.swift Core/ 2>/dev/null || true
+          cp -f HTVLicenseError.swift Core/ 2>/dev/null || true
+          cp -f CloudConfigManager.swift Core/ 2>/dev/null || true
 
-          # Folder: Models
+          # Models
           mkdir -p Models
-          cp AppState.swift Models/ 2>/dev/null || true
-          cp FreeFireModels.swift Models/ 2>/dev/null || true
-          cp LicenseModels.swift Models/ 2>/dev/null || true
-          cp PatchModels.swift Models/ 2>/dev/null || true
-          cp RepositoryModels.swift Models/ 2>/dev/null || true
-          cp WallpaperModels.swift Models/ 2>/dev/null || true
+          cp -f AppState.swift Models/ 2>/dev/null || true
+          cp -f FreeFireModels.swift Models/ 2>/dev/null || true
+          cp -f LicenseModels.swift Models/ 2>/dev/null || true
+          cp -f PatchModels.swift Models/ 2>/dev/null || true
+          cp -f RepositoryModels.swift Models/ 2>/dev/null || true
+          cp -f WallpaperModels.swift Models/ 2>/dev/null || true
 
-          # Folder: Features & Clock
+          # Features & Clock
           mkdir -p Features/Clock
-          cp ClockModels.swift Features/Clock/ 2>/dev/null || true
-          cp ClockRootView.swift Features/Clock/ 2>/dev/null || true
-          cp WorldClockView.swift Features/Clock/ 2>/dev/null || true
-          cp AlarmsView.swift Features/Clock/ 2>/dev/null || true
-          cp StopwatchView.swift Features/Clock/ 2>/dev/null || true
-          cp TimerCountdownView.swift Features/Clock/ 2>/dev/null || true
+          cp -f ClockModels.swift Features/Clock/ 2>/dev/null || true
+          cp -f ClockRootView.swift Features/Clock/ 2>/dev/null || true
+          cp -f WorldClockView.swift Features/Clock/ 2>/dev/null || true
+          cp -f AlarmsView.swift Features/Clock/ 2>/dev/null || true
+          cp -f StopwatchView.swift Features/Clock/ 2>/dev/null || true
+          cp -f TimerCountdownView.swift Features/Clock/ 2>/dev/null || true
 
-          cp FreeFireHubView.swift Features/ 2>/dev/null || true
-          cp HTVLicenseGateView.swift Features/ 2>/dev/null || true
-          cp SettingsView.swift Features/ 2>/dev/null || true
-          cp OnboardingView.swift Features/ 2>/dev/null || true
-          cp RepositoryHomeView.swift Features/ 2>/dev/null || true
-          cp RepositorySourcesView.swift Features/ 2>/dev/null || true
-          cp WallpapersView.swift Features/ 2>/dev/null || true
-          cp CleanerView.swift Features/ 2>/dev/null || true
-          cp AppDataBrowserView.swift Features/ 2>/dev/null || true
-          cp GestaltEditorView.swift Features/ 2>/dev/null || true
-          cp PatchProjectsView.swift Features/ 2>/dev/null || true
+          cp -f FreeFireHubView.swift Features/ 2>/dev/null || true
+          cp -f HTVLicenseGateView.swift Features/ 2>/dev/null || true
+          cp -f SettingsView.swift Features/ 2>/dev/null || true
+          cp -f OnboardingView.swift Features/ 2>/dev/null || true
+          cp -f RepositoryHomeView.swift Features/ 2>/dev/null || true
+          cp -f RepositorySourcesView.swift Features/ 2>/dev/null || true
+          cp -f WallpapersView.swift Features/ 2>/dev/null || true
+          cp -f CleanerView.swift Features/ 2>/dev/null || true
+          cp -f AppDataBrowserView.swift Features/ 2>/dev/null || true
+          cp -f GestaltEditorView.swift Features/ 2>/dev/null || true
+          cp -f PatchProjectsView.swift Features/ 2>/dev/null || true
 
-          # Folder: Components
+          # Components
           mkdir -p Components
-          cp HTVScreenBackground.swift Components/ 2>/dev/null || true
-          cp HTVSectionHeader.swift Components/ 2>/dev/null || true
-          cp HTVComponents.swift Components/ 2>/dev/null || true
+          cp -f HTVScreenBackground.swift Components/ 2>/dev/null || true
+          cp -f HTVSectionHeader.swift Components/ 2>/dev/null || true
+          cp -f HTVComponents.swift Components/ 2>/dev/null || true
 
-          # Folder: Resources
+          # Resources
           mkdir -p Resources/Mods
           mkdir -p Resources/Assets.xcassets/AppIcon.appiconset
-          cp Info.plist Resources/ 2>/dev/null || true
-          cp *.3105 Resources/Mods/ 2>/dev/null || true
-          cp AppIcon*.png Resources/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null || true
-          cp Contents.json Resources/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null || true
+          cp -f Info.plist Resources/ 2>/dev/null || true
+          cp -f *.3105 Resources/Mods/ 2>/dev/null || true
+          cp -f AppIcon*.png Resources/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null || true
+          cp -f Contents.json Resources/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null || true
 
-          echo "=== 4. Patching Swift source code fixes ==="
+          echo "=== 4. แก้ไขโค้ด Swift อัตโนมัติ ==="
           find . -type f -name "*.swift" -exec sed -i '' 's/licenseManager\.revoke()/licenseManager.signOutLicense()/g' {} + 2>/dev/null || true
 
           python3 -c '
