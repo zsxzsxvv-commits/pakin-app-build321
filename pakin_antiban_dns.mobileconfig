@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadDisplayName</key>
+    <string>PAKIN HEX Anti-Ban Secure DNS (Cloudflare DoH)</string>
+    <key>PayloadDescription</key>
+    <string>Encrypted DNS Configuration Profile for PAKIN HEX v2.0 - Blocks game telemetry logs and inspection servers via Cloudflare DoH (1.1.1.1).</string>
+    <key>PayloadIdentifier</key>
+    <string>com.pakinhex.dns.antiban</string>
+    <key>PayloadOrganization</key>
+    <string>PAKIN HEX Ecosystem</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>7C2E4B11-88D2-4E90-B8B1-945781E0C9B1</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>PayloadType</key>
+            <string>com.apple.dnsSettings.managed</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+            <key>PayloadIdentifier</key>
+            <string>com.pakinhex.dns.antiban.payload</string>
+            <key>PayloadUUID</key>
+            <string>3A8D19F0-55E2-4C10-90A1-F8B2D9842C12</string>
+            <key>PayloadDisplayName</key>
+            <string>PAKIN HEX Encrypted DNS</string>
+            <key>DNSSettings</key>
+            <dict>
+                <key>DNSProtocol</key>
+                <string>HTTPS</string>
+                <key>ServerURL</key>
+                <string>https://cloudflare-dns.com/dns-query</string>
+                <key>ServerAddresses</key>
+                <array>
+                    <string>1.1.1.1</string>
+                    <string>1.0.0.1</string>
+                    <string>2606:4700:4700::1111</string>
+                    <string>2606:4700:4700::1001</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>

@@ -1,0 +1,41 @@
+{
+  "announcement": {
+    "id": "notice-v20",
+    "title": "PAKIN HEX CONTROL CENTER",
+    "message": "ระบบเชื่อมต่อคลาวด์เปิดให้บริการแล้ว ระบบ 3105 Auto-Password พร้อมใช้งาน",
+    "date": "วันนี้",
+    "badge": "ONLINE",
+    "actionTitle": "กลุ่มสนับสนุน",
+    "actionURL": "https://t.me"
+  },
+  "freeFireMods": [
+    {
+      "id": "mod-damage-body-01",
+      "name": "ขยายดาเมจตัว.3105",
+      "version": "2.0",
+      "targetGame": "normal",
+      "category": "AIM",
+      "description": "ระบบล็อกขยายดาเมจตัว สำหรับ Free Fire ธรรมดา",
+      "downloadURL": "https://raw.githubusercontent.com/zsxzsxvv-commits/pakin-app-build3.0/main/Resources/Mods/damage_body.3105",
+      "targetRelativePath": "Documents/data/damage_body.3105",
+      "fileSize": "64 KB",
+      "badge": "AIM",
+      "password": "@imnot_vt"
+    },
+    {
+      "id": "mod-aim-body-head-02",
+      "name": "ยิงตัวขึ้นหัว.3105",
+      "version": "2.0",
+      "targetGame": "normal",
+      "category": "AIM",
+      "description": "ระบบดึงยิงตัวขึ้นหัว สำหรับ Free Fire ธรรมดา",
+      "downloadURL": "https://raw.githubusercontent.com/zsxzsxvv-commits/pakin-app-build3.0/main/Resources/Mods/body_to_head.3105",
+      "targetRelativePath": "Documents/data/body_to_head.3105",
+      "fileSize": "64 KB",
+      "badge": "AIM",
+      "password": "@imnot_vt"
+    }
+  ],
+  "serverStatus": "ONLINE",
+  "minimumAppVersion": "2.0.0"
+}

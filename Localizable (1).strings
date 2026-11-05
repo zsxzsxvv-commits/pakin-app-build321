@@ -1,0 +1,45 @@
+/* PAKIN EPIC Thai Localization */
+"app.name" = "PAKIN EPIC";
+"app.subtitle" = "อินเทอร์เฟซสำหรับจัดการไฟล์และแพตช์ของคุณ";
+"license.secure_access" = "SECURE LICENSE ACCESS";
+"license.enter_key" = "กรอก License Key เพื่อเข้าสู่ PAKIN EPIC";
+"license.key_placeholder" = "กรอกคีย์ของคุณ";
+"license.verifying" = "กำลังตรวจสอบ…";
+"license.activate" = "ยืนยันและเปิดใช้งาน";
+"license.verified_access" = "PAKIN EPIC • VERIFIED ACCESS";
+"license.active" = "License พร้อมใช้งาน";
+"license.inactive" = "License ไม่พร้อมใช้งาน";
+"license.sign_out" = "ออกจาก License";
+"license.expired_session" = "Session หมดอายุ กรุณาตรวจสอบ License ใหม่";
+
+"dashboard.kernel_status" = "สถานะระบบ Kernel";
+"dashboard.run_exploit" = "รัน Exploit";
+"dashboard.active" = "พร้อมใช้งาน (Active)";
+"dashboard.inactive" = "ยังไม่เปิดใช้งาน (Inactive)";
+"dashboard.ready_to_edit" = "พร้อมแก้ไขข้อมูล";
+
+"gestalt.title" = "Gestalt Editor";
+"gestalt.action_button" = "Action Button";
+"gestalt.always_on_display" = "Always On Display";
+"gestalt.apple_intelligence" = "Apple Intelligence";
+"gestalt.stage_manager" = "Stage Manager";
+"gestalt.metal_hud" = "Metal HUD";
+"gestalt.apply_changes" = "บันทึกการเปลี่ยนแปลง";
+"gestalt.reboot_device" = "รีบูตอุปกรณ์";
+
+"patch.title" = "แพตช์ (.3105)";
+"patch.new" = "สร้างแพตช์ใหม่";
+"patch.apply" = "ใช้งานแพตช์";
+"patch.restore" = "กู้คืนไฟล์เดิม";
+
+"wallpaper.title" = "วอลเปเปอร์ PosterBoard";
+"wallpaper.reset" = "รีเซ็ตคอลเลกชัน";
+
+"cleaner.title" = "ล้างแคชแอป";
+"cleaner.clean_now" = "ล้างข้อมูลทันที";
+
+"sources.title" = "คลังแพ็กเกจ (Sources)";
+"sources.add" = "เพิ่มคลัง";
+
+"settings.title" = "การตั้งค่า";
+"settings.developer_mode" = "Developer Mode";
