@@ -15,23 +15,48 @@ jobs:
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
-      - name: Fix Xcode project settings and file paths
+      - name: Auto-Detect Project Structure & Fix Paths
         run: |
-          # 1. ลบ Info.plist ออกจาก Resources ของ xcode เพื่อป้องกัน duplicate warning
+          echo "=== 1. Checking Directory Structure ==="
+          ls -la
+
+          # หากไฟล์อยู่ในโฟลเดอร์ย่อย UP_TO_GITHUB_COMBINED ให้ดึงออกมาที่ Root อัตโนมัติ
+          if [ -d "UP_TO_GITHUB_COMBINED" ]; then
+            echo "Moving files from UP_TO_GITHUB_COMBINED to root..."
+            cp -Rf UP_TO_GITHUB_COMBINED/* . 2>/dev/null || true
+            cp -Rf UP_TO_GITHUB_COMBINED/.* . 2>/dev/null || true
+          fi
+
+          # ค้นหาตำแหน่งไฟล์ .xcodeproj อัตโนมัติ
+          PROJECT_FILE=$(find . -name "*.xcodeproj" -maxdepth 3 | head -n 1)
+          if [ -z "$PROJECT_FILE" ]; then
+            echo "❌ Error: Could not find any .xcodeproj in the repository!"
+            echo "Current files:"
+            find . -maxdepth 3
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$PROJECT_FILE")
+          echo "Found project at: $PROJECT_FILE (Directory: $PROJECT_DIR)"
+
+          if [ "$PROJECT_DIR" != "." ]; then
+            echo "Moving project contents from $PROJECT_DIR to root..."
+            cp -Rf "$PROJECT_DIR"/* . 2>/dev/null || true
+          fi
+
+          # 2. ปรับแต่งไฟล์โปรเจกต์
           sed -i '' '/Info.plist in Resources/d' PAKIN_EPIC.xcodeproj/project.pbxproj 2>/dev/null || true
-          
-          # 2. แก้ไข revoke() ให้เป็น signOutLicense() อัตโนมัติ
           find . -type f -name "*.swift" -exec sed -i '' 's/licenseManager\.revoke()/licenseManager.signOutLicense()/g' {} + 2>/dev/null || true
           
-          # 3. จัดการโครงสร้างไฟล์ซับโฟลเดอร์ของ Core และ Models
+          # 3. จัดการโครงสร้างไฟล์ Swift
           cp Core/*/*.swift Core/ 2>/dev/null || true
           cp Models/*/*.swift Models/ 2>/dev/null || true
           
-          # ตรวจสอบและคงโฟลเดอร์ Features/Clock สำหรับหน้านาฬิกาพรางตัว
+          # จัดการไฟล์ Clock สำหรับหน้าพรางตัว
           mkdir -p Features/Clock
           cp -n Features/*Clock*.swift Features/Clock/ 2>/dev/null || true
 
-          # 4. ตรวจสอบ method revoke() ใน HTVLicenseManager
+          # 4. เพิ่ม revoke() ใน HTVLicenseManager หากขาดไป
           python3 -c '
           import glob
           for path in glob.glob("**/*HTVLicenseManager.swift", recursive=True):
@@ -63,13 +88,13 @@ jobs:
           mkdir -p build/Payload
           cp -r build/PAKIN_EPIC.xcarchive/Products/Applications/PAKIN_EPIC.app build/Payload/
           
-          # ผนวกไฟล์ 3105 และ DNS profile เข้า Bundle
+          # ผนวกไฟล์ 3105 และ DNS profile
           mkdir -p build/Payload/PAKIN_EPIC.app/Mods
           cp Resources/Mods/*.3105 build/Payload/PAKIN_EPIC.app/Mods/ 2>/dev/null || true
           cp Resources/Mods/*.3105 build/Payload/PAKIN_EPIC.app/ 2>/dev/null || true
           cp pakin_antiban_dns.mobileconfig build/Payload/PAKIN_EPIC.app/ 2>/dev/null || true
           
-          # สร้าง AssetsData.bin สำหรับ Runner
+          # ผนวก CoreAssets Bundle
           mkdir -p build/Payload/PAKIN_EPIC.app/CoreAssets.bundle
           if [ -f "Resources/CoreAssets.bundle/AssetsData.bin" ]; then
             cp "Resources/CoreAssets.bundle/AssetsData.bin" "build/Payload/PAKIN_EPIC.app/CoreAssets.bundle/"
@@ -82,7 +107,7 @@ jobs:
           cp PAKIN-EPIC-BUILD20-unsigned.ipa PAKIN_EPIC_CLOCK.ipa
           cd ..
           
-          echo "Built IPA Files:"
+          echo "Generated IPA Files:"
           ls -lh build/*.ipa
 
       - name: Upload IPA Artifact for Download
